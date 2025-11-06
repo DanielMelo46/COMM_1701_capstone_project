@@ -328,3 +328,8 @@ VALUES
 (24, 10, 10, 10, 3), -- LeBron 3-pointers
 (25, 10, 10, 11, 4); -- LeBron Free throws
 
+-- Order all the players by number of sports played, then by number of times they’ve changed teams.
+
+
+-- Which soccer team had the highest score differential (goals scored minus goals conceded) in a given season?
+
