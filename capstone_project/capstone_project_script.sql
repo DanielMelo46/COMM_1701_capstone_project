@@ -235,7 +235,8 @@ VALUES
 (25, 1, '2024-11-10 19:00:00', 1), -- Toronto Ice Arena
 (26, 1, '2024-12-05 19:00:00', 2), -- Vancouver Skydome
 (27, 2, '2024-11-15 20:00:00', 3), -- Madrid National Stadium
-(28, 2, '2024-12-20 18:00:00', 4); -- Buenos Aires Arena
+(28, 2, '2024-12-20 18:00:00', 4), 
+(29, 1, '2025-10-15 19:00:00', 1); 
 
 
 INSERT INTO outcome_type (outcome_type_id, league_id, outcome_name, outcome_points)
@@ -320,7 +321,9 @@ VALUES
 (27, 3, 4),  -- Madrid Eagles Win
 (27, 4, 6),  -- Buenos Aires Lions Loss
 (28, 3, 5),  -- Madrid Eagles Draw
-(28, 4, 5);  -- Buenos Aires Lions Draw
+(28, 4, 5),  -- Buenos Aires Lions Draw
+(29, 1, 1),  -- Toronto Blades Win
+(29, 2, 3);
 
 INSERT INTO events (event_id, event_name)
 VALUES
@@ -420,4 +423,7 @@ VALUES
 (78, 1, 26, '2025-08-20 19:20:00', 2, 1),
 (79, 2, 25, '2025-08-05 19:12:00', 2, 1),
 (80, 2, 26, '2025-08-20 19:10:00', 2, 1),
-(81, 2, 26, '2025-08-20 19:22:00', 2, 1);
+(81, 2, 26, '2025-08-20 19:22:00', 2, 1),
+(82, 1, 29, '2025-10-15 19:10:00', 2, NULL),  -- Gretzky Assist
+(83, 1, 29, '2025-10-15 19:25:00', 2, NULL),  -- Gretzky Assist
+(84, 1, 29, '2025-10-15 19:40:00', 1, NULL);
