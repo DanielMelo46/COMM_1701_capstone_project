@@ -119,6 +119,7 @@ SELECT t.name, SUM((scorer.team_id = t.team_id)) -
         SUM((scorer.team_id != t.team_id)) AS score_diff
 
 FROM matches m
+JOIN seasons sns ON m.season_id = sns.season_id
 JOIN match_teams mt ON m.match_id = mt.match_id
 JOIN teams t ON mt.team_id = t.team_id
 JOIN leagues l ON t.league_id = l.league_id
@@ -129,7 +130,7 @@ JOIN player_teams AS scorer ON scorer.player_id = pms.player_id
 WHERE 
     s.name = 'Soccer'
     AND e.event_name = 'Goal'
-    AND m.season_id = 2 -- Given season
+    AND sns.season_number = 2024 -- Given season
 GROUP BY t.team_id
 ;
 
