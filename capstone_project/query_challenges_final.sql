@@ -102,7 +102,8 @@ GROUP BY
 SELECT 
     p.name,
     COUNT(s.name) as number_sports_played, 
-    COUNT(pt.team_id)-1 AS number_of_changes
+    COUNT(pt.team_id)-1 AS number_of_changes -- Number of teams the player 
+                                             -- belonged to -1 to count changes.
 FROM players p
 JOIN player_teams pt ON p.player_id = pt.player_id
 JOIN teams t ON pt.team_id = t.team_id
@@ -117,7 +118,6 @@ ORDER BY number_sports_played DESC,
 -- Which soccer team had the highest score differential (goals scored minus goals conceded) in a given season?
 SELECT t.name, SUM((scorer.team_id = t.team_id)) -
         SUM((scorer.team_id != t.team_id)) AS score_diff
-
 FROM matches m
 JOIN seasons sns ON m.season_id = sns.season_id
 JOIN match_teams mt ON m.match_id = mt.match_id
@@ -131,6 +131,10 @@ WHERE
     s.name = 'Soccer'
     AND e.event_name = 'Goal'
     AND sns.season_number = 2024 -- Given season
+    AND m.match_date BETWEEN scorer.start_date 
+        AND COALESCE(scorer.end_date, m.match_date) -- Making sure the player 
+                                                    -- played for the team when
+                                                    -- the match took place.
 GROUP BY t.team_id
 ;
 
