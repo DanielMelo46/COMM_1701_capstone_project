@@ -172,7 +172,7 @@ WHERE m.match_date BETWEEN pt.start_date
                                             -- played for the team when
                                             -- the match took place.
 GROUP BY p.player_id, t.team_id
-HAVING COUNT(m.match_id) = (
+HAVING COUNT(m.match_id) = ( -- Comparing to find max with a sub query
     SELECT MAX(match_count)
     FROM (
         SELECT COUNT(m2.match_id) AS match_count
@@ -188,20 +188,19 @@ HAVING COUNT(m.match_id) = (
 );
 
 -- # 10
+-- Query: For each team that the player “Michael Jordan” has played 
+-- on, list their win percentage from games that occurred while he 
+-- was on their team. (Assume he only plays in sports where match 
+-- outcomes are limited to “win” and “loss”.)
+-- Solution: 
 -- Finds the win percentage for each team Michael Jordan played on
--- SUM(CASE WHEN) counts wins
--- NULLIF prevents dividing by zero if no games exist 
--- ORDER BY win_percentage DESC ranks his teams by success rate
-SELECT
-    t.team_id,
-    t.name AS team_name,
-    SUM(CASE WHEN ot.outcome_name = 'Win' THEN 1 ELSE 0 END) AS wins,
-    COUNT(CASE WHEN ot.outcome_name IN ('Win','Loss') THEN 1 END) AS total_games,
-    ROUND(
-      100.0 * SUM(CASE WHEN ot.outcome_name = 'Win' THEN 1 ELSE 0 END)
-      / NULLIF(COUNT(CASE WHEN ot.outcome_name IN ('Win','Loss') THEN 1 END), 0),
-      2
-    ) AS win_percentage
+-- USES NULLIF to handle the case in which for some reason, MJ
+-- has no matches as a total (likely impossible due to filters
+-- but still there).
+-- ORDER BY the win_percentage in a DESC order.
+-- GROUP BY team id as we are looking into teams.
+SELECT t.name, p.name, (SUM(ot.outcome_name = 'Win') /
+                        NULLIF(COUNT(m.match_id), 0)) * 100 as win_percentage
 FROM players p
 JOIN player_teams pt ON p.player_id = pt.player_id
 JOIN match_teams mt ON pt.team_id = mt.team_id
@@ -209,8 +208,12 @@ JOIN matches m ON mt.match_id = m.match_id
 JOIN outcome_type ot ON mt.outcome_type_id = ot.outcome_type_id
 JOIN teams t ON pt.team_id = t.team_id
 WHERE p.name = 'Michael Jordan'
-  AND m.match_date BETWEEN pt.start_date
-                       AND COALESCE(pt.end_date, '9999-12-31')
-  AND ot.outcome_name IN ('Win', 'Loss')
-GROUP BY t.team_id, t.name
+AND m.match_date BETWEEN pt.start_date 
+    AND COALESCE(pt.end_date, m.match_date) -- Making sure the player 
+                                            -- played for the team when
+                                            -- the match took place.
+AND ot.outcome_name IN ('Win', 'Loss')
+GROUP BY t.team_id
 ORDER BY win_percentage DESC;
+;
+
