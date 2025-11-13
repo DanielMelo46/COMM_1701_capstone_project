@@ -28,26 +28,27 @@ ORDER BY Goals_and_Assists DESC
 LIMIT 5;
 
 -- # 2
-
 -- From among all hockey players with at least 5 games played, 
 -- who had the highest average number of assists per game?
 
-SELECT p.name, COUNT(event_id) AS Highest_Number_of_Assists
+SELECT p.name, COUNT(e.event_id) / COUNT(DISTINCT(m.match_id))
+     AS avg_assists_per_game
 FROM players p
 JOIN player_match_stats pm ON pm.player_id = p.player_id
+JOIN events e ON pm.event_id = e.event_id
 JOIN matches m ON m.match_id = pm.match_id
 JOIN seasons sns ON sns.season_id = m.season_id
 JOIN leagues l ON l.league_id = sns.league_id
 JOIN sports s ON s.sport_id = l.sport_id
-WHERE event_id = (
-    SELECT event_id 
-    FROM events 
-    WHERE event_name = "Assist"
-)
+WHERE 
+    e.event_name = 'Assist'
+    AND s.name = 'Hockey' 
 GROUP BY p.name
-HAVING COUNT(event_id) > 4
-ORDER BY COUNT(event_id)
+HAVING COUNT(DISTINCT(m.match_id)) > 4
+ORDER BY avg_assists_per_game DESC
 LIMIT 1;
+
+
 
 -- #3
 
