@@ -48,8 +48,6 @@ HAVING COUNT(DISTINCT(m.match_id)) > 4
 ORDER BY avg_assists_per_game DESC
 LIMIT 1;
 
-
-
 -- #3
 
 -- There is a Fortnite (video game) league where match outcomes are 15-12-10-8-7-6-5-4-3-2-1
@@ -110,14 +108,15 @@ JOIN teams t ON pt.team_id = t.team_id
 JOIN leagues l ON t.league_id = l.league_id
 JOIN sports s ON l.sport_id = s.sport_id
 GROUP BY p.name
-ORDER BY number_sports DESC,
+ORDER BY number_sports_played DESC,
          number_of_changes DESC
 ;
 
 -- # 6
 -- Which soccer team had the highest score differential (goals scored minus goals conceded) in a given season?
-SELECT t.name, SUM((scorer.team_id = t.team_id)) AS goals_scored,
-        SUM((scorer.team_id != t.team_id)) AS goals_conceded
+SELECT t.name, SUM((scorer.team_id = t.team_id)) -
+        SUM((scorer.team_id != t.team_id)) AS score_diff
+
 FROM matches m
 JOIN match_teams mt ON m.match_id = mt.match_id
 JOIN teams t ON mt.team_id = t.team_id
@@ -133,11 +132,6 @@ WHERE
 GROUP BY t.team_id
 ;
 
-SELECT p.name,COUNT(pt.team_id)-1 AS number_of_changes
-FROM players p
-JOIN player_teams pt ON p.player_id = pt.player_id
-GROUP BY p.name
-
 
 -- # 7 
 -- Show all players who have never played in a match.
@@ -145,8 +139,7 @@ GROUP BY p.name
 SELECT p.name AS 'Player Name'
 FROM players p 
 LEFT JOIN player_match_stats pm ON p.player_id = pm.player_id
-WHERE match_id IS NULL
-GROUP BY p.name;
+WHERE match_id IS NULL;
 
 -- # 8
 -- Which team has played the most matches?
