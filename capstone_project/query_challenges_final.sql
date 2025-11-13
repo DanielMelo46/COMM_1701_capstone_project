@@ -152,37 +152,40 @@ ORDER BY COUNT(mt.match_id) DESC
 LIMIT 1;
 
 -- # 9 
+-- Challenge: Who is the player with the greatest number of matches played with a
+--  single team (or all the players, in the case of a tie)?
+
+-- Description:
 -- This finds the players with the most matches played for a single team 
 -- Uses a subquery to calculate the maximum number of matches any player has with
 -- any team 
 -- The HAVING clause filters only those player-team pairs that match this maximum
 -- COALESCE makes sure current players with no end date are still included
-SELECT 
-    p.player_id,
-    p.name AS player_name,
-    t.team_id,
-    t.name AS team_name,
-    COUNT(m.match_id) AS matches_played
+SELECT p.name, t.name, COUNT(m.match_id) AS number_of_matches
 FROM players p
 JOIN player_teams pt ON p.player_id = pt.player_id
 JOIN teams t ON pt.team_id = t.team_id              
 JOIN match_teams mt ON t.team_id = mt.team_id
 JOIN matches m ON mt.match_id = m.match_id
-WHERE m.match_date BETWEEN pt.start_date AND COALESCE(pt.end_date, '9999-12-31')
-GROUP BY p.player_id, p.name, t.team_id, t.name
+WHERE m.match_date BETWEEN pt.start_date 
+    AND COALESCE(pt.end_date, m.match_date) -- Making sure the player 
+                                            -- played for the team when
+                                            -- the match took place.
+GROUP BY p.player_id, t.team_id
 HAVING COUNT(m.match_id) = (
-    SELECT MAX(matches_count)
+    SELECT MAX(match_count)
     FROM (
-        SELECT COUNT(m2.match_id) AS matches_count
+        SELECT COUNT(m2.match_id) AS match_count
         FROM players p2
         JOIN player_teams pt2 ON p2.player_id = pt2.player_id
-        JOIN match_teams mt2 ON pt2.team_id = mt2.team_id
+        JOIN teams t2 ON pt2.team_id = t2.team_id
+        JOIN match_teams mt2 ON t2.team_id = mt2.team_id
         JOIN matches m2 ON mt2.match_id = m2.match_id
-        WHERE m2.match_date BETWEEN pt2.start_date AND COALESCE(pt2.end_date, '9999-12-31')
-        GROUP BY p2.player_id, pt2.team_id
-    ) AS sub
-)
-ORDER BY matches_played DESC, player_name;
+        WHERE m2.match_date BETWEEN pt2.start_date 
+              AND COALESCE(pt2.end_date, m2.match_date)
+        GROUP BY p2.player_id, t2.team_id
+    ) AS counts
+);
 
 -- # 10
 -- Finds the win percentage for each team Michael Jordan played on
