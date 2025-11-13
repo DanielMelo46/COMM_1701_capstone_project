@@ -35,6 +35,10 @@ LIMIT 5;
 SELECT p.name, COUNT(event_id) AS Highest_Number_of_Assists
 FROM players p
 JOIN player_match_stats pm ON pm.player_id = p.player_id
+JOIN matches m ON m.match_id = pm.match_id
+JOIN seasons sns ON sns.season_id = m.season_id
+JOIN leagues l ON l.league_id = sns.league_id
+JOIN sports s ON s.sport_id = l.sport_id
 WHERE event_id = (
     SELECT event_id 
     FROM events 
