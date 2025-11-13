@@ -31,7 +31,8 @@ LIMIT 5;
 -- From among all hockey players with at least 5 games played, 
 -- who had the highest average number of assists per game?
 
-SELECT p.name, COUNT(e.event_id) / COUNT(DISTINCT(m.match_id))
+SELECT p.name, COUNT(e.event_id) / 
+               NULLIF(COUNT(DISTINCT(m.match_id)),0)
      AS avg_assists_per_game
 FROM players p
 JOIN player_match_stats pm ON pm.player_id = p.player_id
